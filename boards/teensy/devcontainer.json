@@ -1,0 +1,33 @@
+{
+  "name": "Teensy Dev",
+  "image": "dev-teensy:latest",
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+
+  // USB access for Teensy Loader — requires /dev/hidraw* and /dev/bus/usb on host
+  "runArgs": ["--privileged", "--net=host"],
+
+  "mounts": [
+    // Persist PlatformIO package cache between rebuilds
+    "source=platformio-packages,target=/root/.platformio,type=volume"
+  ],
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "platformio.platformio-ide",
+        "ms-vscode.cpptools",
+        "ms-vscode.cpptools-themes",
+        "marus25.cortex-debug"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "platformio-ide.useBuiltinPIOCore": false,
+        "platformio-ide.pioHomeDir": "/root/.platformio",
+        "platformio-ide.customPATH": "/usr/local/bin"
+      }
+    }
+  },
+
+  "postCreateCommand": "pio system prune -f; pio --version && echo 'PlatformIO ready. Create project: pio project init --board teensy41'"
+}

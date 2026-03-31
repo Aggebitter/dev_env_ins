@@ -1,0 +1,20 @@
+# Pico / CMake build output
+build/
+*.uf2
+*.elf
+*.bin
+*.dis
+*.map
+*.lst
+*.hex
+
+# CMake generated
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# OS
+.DS_Store
+Thumbs.db
+*~

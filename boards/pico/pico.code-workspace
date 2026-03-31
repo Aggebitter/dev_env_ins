@@ -1,0 +1,147 @@
+{
+  "folders": [
+    { "path": "projects", "name": "Projects" },
+    { "path": "knowledge", "name": "Knowledge" }
+  ],
+
+  "settings": {
+    "cmake.configureSettings": {
+      "PICO_SDK_PATH": "/opt/pico-sdk",
+      "PICO_BOARD": "pico"
+    },
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "C_Cpp.default.compilerPath": "/usr/bin/arm-none-eabi-gcc",
+    "C_Cpp.default.includePath": [
+      "/opt/pico-sdk/src/**",
+      "${workspaceFolder}/**"
+    ],
+    "C_Cpp.default.defines": [
+      "PICO_BOARD=pico"
+    ]
+  },
+
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Pico: CMake Configure",
+        "type": "shell",
+        "command": "cmake -B build -DPICO_SDK_PATH=/opt/pico-sdk -DPICO_BOARD=${input:board} .",
+        "options": { "cwd": "${input:projectDir}" },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "Pico: Build",
+        "type": "shell",
+        "command": "cmake --build build -j$(nproc)",
+        "options": { "cwd": "${input:projectDir}" },
+        "group": { "kind": "build", "isDefault": true },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "Pico: Configure & Build",
+        "type": "shell",
+        "command": "cmake -B build -DPICO_SDK_PATH=/opt/pico-sdk -DPICO_BOARD=${input:board} . && cmake --build build -j$(nproc)",
+        "options": { "cwd": "${input:projectDir}" },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "Pico: Flash (picotool)",
+        "type": "shell",
+        "command": "picotool load build/${input:elfName}.uf2 -f && picotool reboot",
+        "options": { "cwd": "${input:projectDir}" },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "Pico: Flash (USB mass storage)",
+        "type": "shell",
+        "command": "cp build/${input:elfName}.uf2 /media/${env:USER}/RPI-RP2/",
+        "options": { "cwd": "${input:projectDir}" },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "Pico: Monitor (tio)",
+        "type": "shell",
+        "command": "tio ${input:port}",
+        "presentation": { "reveal": "always", "panel": "dedicated" }
+      },
+      {
+        "label": "Pico: Clean",
+        "type": "shell",
+        "command": "rm -rf build",
+        "options": { "cwd": "${input:projectDir}" },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      }
+    ],
+    "inputs": [
+      {
+        "id": "board",
+        "type": "pickString",
+        "description": "Pico board target",
+        "options": ["pico", "pico2", "pico_w", "pico2_w"],
+        "default": "pico"
+      },
+      {
+        "id": "port",
+        "type": "promptString",
+        "description": "Serial port",
+        "default": "/dev/ttyACM0"
+      },
+      {
+        "id": "projectDir",
+        "type": "promptString",
+        "description": "Path to project folder",
+        "default": "${workspaceFolder:Projects}"
+      },
+      {
+        "id": "elfName",
+        "type": "promptString",
+        "description": "Binary name (no extension)",
+        "default": "main"
+      }
+    ]
+  },
+
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Debug Pico (SWD via picoprobe)",
+        "type": "cortex-debug",
+        "request": "launch",
+        "servertype": "openocd",
+        "device": "RP2040",
+        "configFiles": [
+          "interface/cmsis-dap.cfg",
+          "target/rp2040.cfg"
+        ],
+        "executable": "${workspaceFolder:Projects}/build/main.elf",
+        "svdFile": "/opt/pico-sdk/src/rp2040/hardware_regs/rp2040.svd",
+        "preLaunchTask": "Pico: Build"
+      },
+      {
+        "name": "Debug Pico 2 (SWD via picoprobe)",
+        "type": "cortex-debug",
+        "request": "launch",
+        "servertype": "openocd",
+        "device": "RP2350",
+        "configFiles": [
+          "interface/cmsis-dap.cfg",
+          "target/rp2350.cfg"
+        ],
+        "executable": "${workspaceFolder:Projects}/build/main.elf",
+        "preLaunchTask": "Pico: Build"
+      }
+    ]
+  },
+
+  "extensions": {
+    "recommendations": [
+      "ms-vscode.cpptools",
+      "ms-vscode.cpptools-themes",
+      "ms-vscode.cmake-tools",
+      "marus25.cortex-debug",
+      "ms-vscode-remote.remote-containers"
+    ]
+  }
+}

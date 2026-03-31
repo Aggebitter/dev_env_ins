@@ -1,0 +1,108 @@
+{
+  "folders": [
+    { "path": "projects", "name": "Projects" },
+    { "path": "knowledge", "name": "Knowledge" }
+  ],
+
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "bash"
+  },
+
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "PIO: Build",
+        "type": "shell",
+        "command": "pio run",
+        "options": { "cwd": "${input:projectDir}" },
+        "group": { "kind": "build", "isDefault": true },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "PIO: Upload",
+        "type": "shell",
+        "command": "pio run --target upload",
+        "options": { "cwd": "${input:projectDir}" },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "PIO: Build & Upload",
+        "type": "shell",
+        "command": "pio run --target upload",
+        "options": { "cwd": "${input:projectDir}" },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "PIO: Monitor",
+        "type": "shell",
+        "command": "pio device monitor",
+        "options": { "cwd": "${input:projectDir}" },
+        "presentation": { "reveal": "always", "panel": "dedicated" }
+      },
+      {
+        "label": "PIO: Upload & Monitor",
+        "type": "shell",
+        "command": "pio run --target upload && pio device monitor",
+        "options": { "cwd": "${input:projectDir}" },
+        "presentation": { "reveal": "always", "panel": "dedicated" }
+      },
+      {
+        "label": "PIO: New Project (Teensy 4.1)",
+        "type": "shell",
+        "command": "mkdir -p ${input:newProjectName} && cd ${input:newProjectName} && pio project init --board teensy41 --ide vscode",
+        "options": { "cwd": "${workspaceFolder:Projects}" },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "PIO: Clean",
+        "type": "shell",
+        "command": "pio run --target clean",
+        "options": { "cwd": "${input:projectDir}" },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      }
+    ],
+    "inputs": [
+      {
+        "id": "projectDir",
+        "type": "promptString",
+        "description": "Path to PlatformIO project",
+        "default": "${workspaceFolder:Projects}"
+      },
+      {
+        "id": "newProjectName",
+        "type": "promptString",
+        "description": "New project folder name"
+      }
+    ]
+  },
+
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Debug Teensy 4.x (SWD)",
+        "type": "cortex-debug",
+        "request": "launch",
+        "servertype": "openocd",
+        "device": "MIMXRT1062",
+        "configFiles": [
+          "interface/cmsis-dap.cfg",
+          "target/imxrt.cfg"
+        ],
+        "executable": "${workspaceFolder:Projects}/.pio/build/teensy41/firmware.elf",
+        "preLaunchTask": "PIO: Build"
+      }
+    ]
+  },
+
+  "extensions": {
+    "recommendations": [
+      "platformio.platformio-ide",
+      "ms-vscode.cpptools",
+      "ms-vscode.cpptools-themes",
+      "marus25.cortex-debug",
+      "ms-vscode-remote.remote-containers"
+    ]
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "name": "ESP32 Dev",
+  "image": "dev-esp32:latest",
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+
+  // USB access for flashing via esptool — requires /dev/ttyUSB* or /dev/ttyACM* on host
+  "runArgs": ["--privileged", "--net=host"],
+
+  "mounts": [
+    // Persist IDF component manager cache
+    "source=esp-idf-components,target=/root/.espressif,type=volume"
+  ],
+
+  "remoteEnv": {
+    "IDF_PATH": "/opt/esp-idf"
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cpptools-themes",
+        "espressif.esp-idf-extension"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "idf.espIdfPath": "/opt/esp-idf",
+        "idf.toolsPath": "/root/.espressif/tools",
+        "idf.pythonBinPath": "/usr/bin/python3",
+        // compilerPath is intentionally omitted — the ESP-IDF extension resolves
+        // the versioned toolchain path automatically via idf.toolsPath
+        "C_Cpp.default.includePath": [
+          "/opt/esp-idf/components/**",
+          "${workspaceFolder}/**"
+        ]
+      }
+    }
+  },
+
+  // Sources export.sh so PATH includes the versioned toolchain binaries in every terminal
+  "postStartCommand": "source /opt/esp-idf/export.sh",
+  "postCreateCommand": "source /opt/esp-idf/export.sh && idf.py --version"
+}

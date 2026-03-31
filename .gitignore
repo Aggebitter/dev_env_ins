@@ -1,0 +1,9 @@
+# Generated at runtime by install.sh — not part of the installer
+# (actual projects live under ~/claude/ and ~/dev/, not here)
+
+# Logs and temp files
+*.log
+*.tmp
+*~
+.DS_Store
+Thumbs.db

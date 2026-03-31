@@ -1,0 +1,111 @@
+{
+  "folders": [
+    { "path": "projects", "name": "Projects" },
+    { "path": "knowledge", "name": "Knowledge" }
+  ],
+
+  "settings": {
+    "C_Cpp.default.compilerPath": "/usr/bin/avr-gcc",
+    "C_Cpp.default.includePath": [
+      "/usr/lib/avr/include",
+      "/root/.arduino15/packages/**",
+      "${workspaceFolder}/**"
+    ],
+    "C_Cpp.default.defines": [
+      "F_CPU=16000000UL",
+      "ARDUINO=10819"
+    ],
+    "files.associations": {
+      "*.ino": "cpp"
+    }
+  },
+
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Arduino: Compile",
+        "type": "shell",
+        "command": "arduino-cli compile --fqbn ${input:fqbn} .",
+        "options": { "cwd": "${input:sketchDir}" },
+        "group": { "kind": "build", "isDefault": true },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "Arduino: Upload",
+        "type": "shell",
+        "command": "arduino-cli upload --fqbn ${input:fqbn} --port ${input:port} .",
+        "options": { "cwd": "${input:sketchDir}" },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "Arduino: Compile & Upload",
+        "type": "shell",
+        "command": "arduino-cli compile --fqbn ${input:fqbn} . && arduino-cli upload --fqbn ${input:fqbn} --port ${input:port} .",
+        "options": { "cwd": "${input:sketchDir}" },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "Arduino: Monitor",
+        "type": "shell",
+        "command": "arduino-cli monitor --port ${input:port} --config baudrate=115200",
+        "presentation": { "reveal": "always", "panel": "dedicated" }
+      },
+      {
+        "label": "Arduino: List Boards",
+        "type": "shell",
+        "command": "arduino-cli board list",
+        "presentation": { "reveal": "always", "panel": "shared" }
+      }
+    ],
+    "inputs": [
+      {
+        "id": "fqbn",
+        "type": "promptString",
+        "description": "Board FQBN — run 'Arduino: List Boards' to find it",
+        "default": "arduino:avr:uno"
+      },
+      {
+        "id": "port",
+        "type": "promptString",
+        "description": "Serial port",
+        "default": "/dev/ttyACM0"
+      },
+      {
+        "id": "sketchDir",
+        "type": "promptString",
+        "description": "Path to sketch folder",
+        "default": "${workspaceFolder:Projects}"
+      }
+    ]
+  },
+
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Debug ARM Arduino (CMSIS-DAP)",
+        "type": "cortex-debug",
+        "request": "launch",
+        "servertype": "openocd",
+        "device": "cortex-m0",
+        "configFiles": [
+          "interface/cmsis-dap.cfg",
+          "target/at91samdXX.cfg"
+        ],
+        "svdFile": "",
+        "executable": "${workspaceFolder:Projects}/build/sketch.elf",
+        "preLaunchTask": "Arduino: Compile"
+      }
+    ]
+  },
+
+  "extensions": {
+    "recommendations": [
+      "ms-vscode.cpptools",
+      "ms-vscode.cpptools-themes",
+      "marus25.cortex-debug",
+      "ms-vscode-remote.remote-containers"
+    ]
+  }
+}

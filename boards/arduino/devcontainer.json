@@ -1,0 +1,43 @@
+{
+  "name": "Arduino Dev",
+  "image": "dev-arduino:latest",
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+
+  // USB access for flashing — requires host udev rules for /dev/ttyACM* and /dev/ttyUSB*
+  "runArgs": ["--privileged", "--net=host"],
+
+  "mounts": [
+    // Persist arduino-cli config and installed cores/libraries between container rebuilds
+    "source=arduino-cli-data,target=/root/.arduino15,type=volume"
+  ],
+
+  "remoteEnv": {
+    "PATH": "/root/bin:${containerEnv:PATH}"
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cpptools-themes",
+        "marus25.cortex-debug"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "C_Cpp.default.compilerPath": "/usr/bin/avr-gcc",
+        "C_Cpp.default.includePath": [
+          "/usr/lib/avr/include",
+          "/root/.arduino15/packages/**",
+          "${workspaceFolder}/**"
+        ],
+        "C_Cpp.default.defines": [
+          "F_CPU=16000000UL",
+          "ARDUINO=10819"
+        ]
+      }
+    }
+  },
+
+  "postCreateCommand": "echo 'Container ready. Run: arduino-cli board list'"
+}

@@ -1,0 +1,41 @@
+{
+  "name": "Raspberry Pi Pico Dev",
+  "image": "dev-pico:latest",
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+
+  // USB access for picotool/SWD debugging via picoprobe/CMSIS-DAP
+  "runArgs": ["--privileged", "--net=host"],
+
+  "remoteEnv": {
+    "PICO_SDK_PATH": "/opt/pico-sdk"
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cpptools-themes",
+        "ms-vscode.cmake-tools",
+        "marus25.cortex-debug"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "cmake.configureSettings": {
+          "PICO_SDK_PATH": "/opt/pico-sdk"
+        },
+        "cmake.buildDirectory": "${workspaceFolder}/build",
+        "C_Cpp.default.compilerPath": "/usr/bin/arm-none-eabi-gcc",
+        "C_Cpp.default.includePath": [
+          "/opt/pico-sdk/src/**",
+          "${workspaceFolder}/**"
+        ],
+        "C_Cpp.default.defines": [
+          "PICO_BOARD=pico"
+        ]
+      }
+    }
+  },
+
+  "postCreateCommand": "echo 'Pico SDK ready at $PICO_SDK_PATH. Run: cmake --version'"
+}
