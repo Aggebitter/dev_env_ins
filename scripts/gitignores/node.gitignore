@@ -1,0 +1,17 @@
+# Node
+node_modules/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+npm-debug.log*
+pnpm-debug.log*
+
+# Secrets
+.env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db
+*~

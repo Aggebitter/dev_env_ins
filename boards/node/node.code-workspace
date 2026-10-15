@@ -1,0 +1,121 @@
+{
+  "folders": [
+    { "path": "projects", "name": "Projects" },
+    { "path": "knowledge", "name": "Knowledge" }
+  ],
+
+  "settings": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "typescript.tsdk": "node_modules/typescript/lib"
+  },
+
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Node: Install",
+        "type": "shell",
+        "command": "npm install",
+        "options": { "cwd": "${input:projectDir}" },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "Node: Start",
+        "type": "shell",
+        "command": "npm start",
+        "options": { "cwd": "${input:projectDir}" },
+        "presentation": { "reveal": "always", "panel": "dedicated" }
+      },
+      {
+        "label": "Node: Dev (watch)",
+        "type": "shell",
+        "command": "npm run dev",
+        "options": { "cwd": "${input:projectDir}" },
+        "isBackground": true,
+        "problemMatcher": [],
+        "presentation": { "reveal": "always", "panel": "dedicated" }
+      },
+      {
+        "label": "Node: Build (tsc)",
+        "type": "shell",
+        "command": "npm run build",
+        "options": { "cwd": "${input:projectDir}" },
+        "group": { "kind": "build", "isDefault": true },
+        "problemMatcher": ["$tsc"],
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "Node: Typecheck",
+        "type": "shell",
+        "command": "npm run typecheck",
+        "options": { "cwd": "${input:projectDir}" },
+        "problemMatcher": ["$tsc"],
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "Node: Test",
+        "type": "shell",
+        "command": "npm test",
+        "options": { "cwd": "${input:projectDir}" },
+        "group": { "kind": "test", "isDefault": true },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "Node: Clean",
+        "type": "shell",
+        "command": "rm -rf node_modules dist",
+        "options": { "cwd": "${input:projectDir}" },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      }
+    ],
+    "inputs": [
+      {
+        "id": "projectDir",
+        "type": "promptString",
+        "description": "Path to project folder",
+        "default": "${workspaceFolder:Projects}"
+      }
+    ]
+  },
+
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Node: Current File",
+        "type": "node",
+        "request": "launch",
+        "program": "${file}",
+        "cwd": "${fileDirname}",
+        "console": "integratedTerminal",
+        "skipFiles": ["<node_internals>/**"]
+      },
+      {
+        "name": "Node: npm start",
+        "type": "node",
+        "request": "launch",
+        "runtimeExecutable": "npm",
+        "runtimeArgs": ["start"],
+        "cwd": "${fileDirname}",
+        "console": "integratedTerminal",
+        "skipFiles": ["<node_internals>/**"]
+      },
+      {
+        "name": "Node: Attach (:9229)",
+        "type": "node",
+        "request": "attach",
+        "port": 9229,
+        "skipFiles": ["<node_internals>/**"]
+      }
+    ]
+  },
+
+  "extensions": {
+    "recommendations": [
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "ms-vscode-remote.remote-containers"
+    ]
+  }
+}

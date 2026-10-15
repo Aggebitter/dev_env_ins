@@ -1,0 +1,130 @@
+{
+  "folders": [
+    { "path": "projects", "name": "Projects" },
+    { "path": "knowledge", "name": "Knowledge" }
+  ],
+
+  "settings": {
+    "python.testing.pytestEnabled": true,
+    "python.analysis.typeCheckingMode": "basic",
+    "[python]": {
+      "editor.defaultFormatter": "charliermarsh.ruff",
+      "editor.formatOnSave": true
+    }
+  },
+
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Python: Sync (uv)",
+        "type": "shell",
+        "command": "uv sync",
+        "options": { "cwd": "${input:projectDir}" },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "Python: Run",
+        "type": "shell",
+        "command": "uv run python ${input:entry}",
+        "options": { "cwd": "${input:projectDir}" },
+        "group": { "kind": "build", "isDefault": true },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "Python: Test (pytest)",
+        "type": "shell",
+        "command": "uv run pytest -v",
+        "options": { "cwd": "${input:projectDir}" },
+        "group": { "kind": "test", "isDefault": true },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "Python: Lint (ruff)",
+        "type": "shell",
+        "command": "ruff check .",
+        "options": { "cwd": "${input:projectDir}" },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "Python: Format (ruff)",
+        "type": "shell",
+        "command": "ruff format .",
+        "options": { "cwd": "${input:projectDir}" },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "Python: Add dependency",
+        "type": "shell",
+        "command": "uv add ${input:package}",
+        "options": { "cwd": "${input:projectDir}" },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "Python: Clean",
+        "type": "shell",
+        "command": "rm -rf .venv .pytest_cache .ruff_cache && find . -name __pycache__ -type d -prune -exec rm -rf {} +",
+        "options": { "cwd": "${input:projectDir}" },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      }
+    ],
+    "inputs": [
+      {
+        "id": "projectDir",
+        "type": "promptString",
+        "description": "Path to project folder",
+        "default": "${workspaceFolder:Projects}"
+      },
+      {
+        "id": "entry",
+        "type": "promptString",
+        "description": "Script to run",
+        "default": "main.py"
+      },
+      {
+        "id": "package",
+        "type": "promptString",
+        "description": "Package to add (e.g. requests)"
+      }
+    ]
+  },
+
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Python: Current File",
+        "type": "debugpy",
+        "request": "launch",
+        "program": "${file}",
+        "cwd": "${fileDirname}",
+        "console": "integratedTerminal",
+        "justMyCode": true
+      },
+      {
+        "name": "Python: Current File (with args)",
+        "type": "debugpy",
+        "request": "launch",
+        "program": "${file}",
+        "cwd": "${fileDirname}",
+        "args": "${command:pickArgs}",
+        "console": "integratedTerminal"
+      },
+      {
+        "name": "Python: Attach (debugpy :5678)",
+        "type": "debugpy",
+        "request": "attach",
+        "connect": { "host": "localhost", "port": 5678 }
+      }
+    ]
+  },
+
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-python.debugpy",
+      "charliermarsh.ruff",
+      "ms-vscode-remote.remote-containers"
+    ]
+  }
+}

@@ -2,7 +2,7 @@
 """
 make-icons.py — Generate composite desktop icons: VS Code + board badge.
 Usage: python3 make-icons.py [board1 board2 ...]
-       If no boards given, generates all four.
+       If no boards given, generates all environments.
 """
 import sys
 import os
@@ -13,6 +13,9 @@ BOARD_CFG = {
     'esp32':   {'bg': (231,  53,  44), 'text': 'ESP', 'fg': (255, 255, 255)},
     'pico':    {'bg': (197,  26,  74), 'text': 'Pi',  'fg': (255, 255, 255)},
     'teensy':  {'bg': (0,   102, 178), 'text': 'T4',  'fg': (255, 255, 255)},
+    'python':  {'bg': (55,  118, 171), 'text': 'Py',  'fg': (255, 212,  59)},
+    'node':    {'bg': (51,  153,  51), 'text': 'TS',  'fg': (255, 255, 255)},
+    'cpp':     {'bg': (0,    89, 156), 'text': 'C++', 'fg': (255, 255, 255)},
 }
 
 VSCODE_ICONS = [

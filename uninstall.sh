@@ -27,7 +27,7 @@ if [[ "$EUID" -eq 0 ]]; then
     exit 1
 fi
 
-BOARDS=(arduino esp32 pico teensy)
+BOARDS=(arduino esp32 pico teensy python node cpp)
 TREES=(claude dev)
 BUILD_BOARDS=("${BOARDS[@]}")
 PURGE=false
@@ -124,7 +124,8 @@ fi
 # ── Step 2: Docker volumes ────────────────────────────────────────────────────
 log_section "Docker Volumes"
 if command -v docker &>/dev/null; then
-    volumes=(arduino-cli-data esp-idf-components platformio-packages)
+    volumes=(arduino-cli-data esp-idf-components platformio-packages
+             python-uv-cache node-npm-cache node-pnpm-store cpp-ccache)
     for vol in "${volumes[@]}"; do
         if docker volume inspect "$vol" &>/dev/null 2>&1; then
             log_info "Removing volume: ${vol}"

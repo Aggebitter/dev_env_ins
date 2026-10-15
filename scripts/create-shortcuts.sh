@@ -3,7 +3,7 @@
 # Composites VS Code + board badge icon, writes .desktop file, pins to GNOME dash.
 #
 # Usage: create-shortcuts.sh [board1 board2 ...]
-#        If no boards given, creates shortcuts for all four.
+#        If no boards given, creates shortcuts for all environments.
 
 set -euo pipefail
 
@@ -19,11 +19,14 @@ declare -A BOARD_NAMES=(
     [esp32]="ESP32 Dev"
     [pico]="Pico Dev"
     [teensy]="Teensy Dev"
+    [python]="Python Dev"
+    [node]="Node Dev"
+    [cpp]="C++ Dev"
 )
 
-BOARDS=("${@:-arduino esp32 pico teensy}")
+BOARDS=("$@")
 if [[ $# -eq 0 ]]; then
-    BOARDS=(arduino esp32 pico teensy)
+    BOARDS=(arduino esp32 pico teensy python node cpp)
 fi
 
 APPS_DIR="$HOME/.local/share/applications"

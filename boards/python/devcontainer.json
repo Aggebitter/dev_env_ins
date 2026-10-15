@@ -1,0 +1,34 @@
+{
+  "name": "Python Dev",
+  "image": "dev-python:latest",
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+
+  // Host networking so dev servers (Flask, FastAPI, Jupyter...) are reachable on localhost
+  "runArgs": ["--net=host"],
+
+  "mounts": [
+    // Persist uv package/interpreter cache between rebuilds
+    "source=python-uv-cache,target=/root/.cache/uv,type=volume"
+  ],
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.debugpy",
+        "charliermarsh.ruff"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "python.testing.pytestEnabled": true,
+        "[python]": {
+          "editor.defaultFormatter": "charliermarsh.ruff",
+          "editor.formatOnSave": true
+        }
+      }
+    }
+  },
+
+  "postCreateCommand": "python3 --version && uv --version && echo 'Python ready. Create project: new-project python <name>'"
+}

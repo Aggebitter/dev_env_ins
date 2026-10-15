@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # new-project.sh — Create a new project with git init and board-appropriate .gitignore
 # Usage: new-project.sh <board> <project-name> [tree]
-#   board        : arduino | esp32 | pico | teensy
+#   board        : arduino | esp32 | pico | teensy | python | node | cpp
 #   project-name : name of the new project folder
 #   tree         : claude (default) | dev
 
@@ -15,13 +15,13 @@ log_info()  { echo -e "${CYAN}[INFO]${RESET}  $*"; }
 log_ok()    { echo -e "${GREEN}[OK]${RESET}    $*"; }
 log_error() { echo -e "${RED}[ERROR]${RESET} $*" >&2; exit 1; }
 
-VALID_BOARDS=(arduino esp32 pico teensy)
+VALID_BOARDS=(arduino esp32 pico teensy python node cpp)
 
 usage() {
     cat <<EOF
 Usage: new-project.sh <board> <project-name> [tree]
 
-  board        : arduino | esp32 | pico | teensy
+  board        : arduino | esp32 | pico | teensy | python | node | cpp
   project-name : name for the new project folder
   tree         : claude (default) | dev
 
@@ -29,6 +29,7 @@ Examples:
   new-project.sh arduino blink
   new-project.sh esp32 wifi-sensor dev
   new-project.sh pico hello-world claude
+  new-project.sh python data-tool
 EOF
 }
 
@@ -163,6 +164,136 @@ void loop() {
     delay(500);
     digitalWrite(LED_PIN, LOW);
     delay(500);
+}
+EOF
+        ;;
+    python)
+        cat > "${PROJECT_DIR}/pyproject.toml" <<EOF
+[project]
+name = "${PROJECT_NAME}"
+version = "0.1.0"
+description = ""
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = ["pytest", "ruff"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+EOF
+        cat > "${PROJECT_DIR}/main.py" <<EOF
+"""${PROJECT_NAME}"""
+
+
+def greet(name: str) -> str:
+    return f"Hello, {name}!"
+
+
+def main() -> None:
+    print(greet("world"))
+
+
+if __name__ == "__main__":
+    main()
+EOF
+        mkdir -p "${PROJECT_DIR}/tests"
+        cat > "${PROJECT_DIR}/tests/test_main.py" <<EOF
+from main import greet
+
+
+def test_greet():
+    assert greet("world") == "Hello, world!"
+EOF
+        ;;
+    node)
+        cat > "${PROJECT_DIR}/package.json" <<EOF
+{
+  "name": "${PROJECT_NAME}",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.ts",
+    "dev": "node --watch src/index.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test \"src/**/*.test.ts\""
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0"
+  }
+}
+EOF
+        cat > "${PROJECT_DIR}/tsconfig.json" <<EOF
+{
+  "compilerOptions": {
+    "target": "es2023",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "rootDir": "src",
+    "outDir": "dist",
+    "strict": true,
+    "skipLibCheck": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "rewriteRelativeImportExtensions": true
+  },
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts"]
+}
+EOF
+        mkdir -p "${PROJECT_DIR}/src"
+        cat > "${PROJECT_DIR}/src/greet.ts" <<EOF
+export function greet(name: string): string {
+    return \`Hello, \${name}!\`;
+}
+EOF
+        cat > "${PROJECT_DIR}/src/index.ts" <<EOF
+// ${PROJECT_NAME}
+import { greet } from "./greet.ts";
+
+console.log(greet("world"));
+EOF
+        cat > "${PROJECT_DIR}/src/greet.test.ts" <<EOF
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { greet } from "./greet.ts";
+
+test("greet", () => {
+    assert.equal(greet("world"), "Hello, world!");
+});
+EOF
+        ;;
+    cpp)
+        cat > "${PROJECT_DIR}/CMakeLists.txt" <<EOF
+cmake_minimum_required(VERSION 3.20)
+project(${PROJECT_NAME} CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+add_compile_options(-Wall -Wextra -Wpedantic)
+
+add_executable(main src/main.cpp)
+
+enable_testing()
+add_test(NAME runs COMMAND main)
+EOF
+        mkdir -p "${PROJECT_DIR}/src"
+        cat > "${PROJECT_DIR}/src/main.cpp" <<EOF
+// ${PROJECT_NAME}
+#include <iostream>
+
+int main() {
+    std::cout << "Hello, world!\n";
+    return 0;
 }
 EOF
         ;;

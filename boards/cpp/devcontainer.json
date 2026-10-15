@@ -1,0 +1,34 @@
+{
+  "name": "C/C++ Native Dev",
+  "image": "dev-cpp:latest",
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+
+  // ptrace for gdb/valgrind; host networking for socket/network programs
+  "runArgs": ["--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined", "--net=host"],
+
+  "mounts": [
+    // Persist compiler cache between rebuilds
+    "source=cpp-ccache,target=/root/.cache/ccache,type=volume"
+  ],
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cpptools-themes",
+        "ms-vscode.cmake-tools"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "cmake.generator": "Ninja",
+        "cmake.buildDirectory": "${workspaceFolder}/build",
+        "C_Cpp.default.compilerPath": "/usr/bin/g++",
+        "C_Cpp.default.cppStandard": "c++20",
+        "C_Cpp.default.cStandard": "c17"
+      }
+    }
+  },
+
+  "postCreateCommand": "g++ --version | head -1 && cmake --version | head -1 && echo 'C/C++ ready. Create project: new-project cpp <name>'"
+}

@@ -1,0 +1,139 @@
+{
+  "folders": [
+    { "path": "projects", "name": "Projects" },
+    { "path": "knowledge", "name": "Knowledge" }
+  ],
+
+  "settings": {
+    "cmake.generator": "Ninja",
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "C_Cpp.default.compilerPath": "/usr/bin/g++",
+    "C_Cpp.default.cppStandard": "c++20",
+    "C_Cpp.default.cStandard": "c17",
+    "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json"
+  },
+
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "C++: CMake Configure",
+        "type": "shell",
+        "command": "cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=${input:buildType} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_COMPILER_LAUNCHER=ccache .",
+        "options": { "cwd": "${input:projectDir}" },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "C++: Build",
+        "type": "shell",
+        "command": "cmake --build build -j$(nproc)",
+        "options": { "cwd": "${input:projectDir}" },
+        "group": { "kind": "build", "isDefault": true },
+        "problemMatcher": ["$gcc"],
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "C++: Configure & Build",
+        "type": "shell",
+        "command": "cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=${input:buildType} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_COMPILER_LAUNCHER=ccache . && cmake --build build -j$(nproc)",
+        "options": { "cwd": "${input:projectDir}" },
+        "problemMatcher": ["$gcc"],
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "C++: Run",
+        "type": "shell",
+        "command": "./build/${input:exeName}",
+        "options": { "cwd": "${input:projectDir}" },
+        "presentation": { "reveal": "always", "panel": "dedicated" }
+      },
+      {
+        "label": "C++: Test (ctest)",
+        "type": "shell",
+        "command": "ctest --test-dir build --output-on-failure",
+        "options": { "cwd": "${input:projectDir}" },
+        "group": { "kind": "test", "isDefault": true },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "C++: Valgrind",
+        "type": "shell",
+        "command": "valgrind --leak-check=full ./build/${input:exeName}",
+        "options": { "cwd": "${input:projectDir}" },
+        "presentation": { "reveal": "always", "panel": "dedicated" }
+      },
+      {
+        "label": "C++: Clean",
+        "type": "shell",
+        "command": "rm -rf build",
+        "options": { "cwd": "${input:projectDir}" },
+        "presentation": { "reveal": "always", "panel": "shared" }
+      }
+    ],
+    "inputs": [
+      {
+        "id": "buildType",
+        "type": "pickString",
+        "description": "CMake build type",
+        "options": ["Debug", "Release", "RelWithDebInfo"],
+        "default": "Debug"
+      },
+      {
+        "id": "projectDir",
+        "type": "promptString",
+        "description": "Path to project folder",
+        "default": "${workspaceFolder:Projects}"
+      },
+      {
+        "id": "exeName",
+        "type": "promptString",
+        "description": "Executable name",
+        "default": "main"
+      }
+    ]
+  },
+
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Debug (gdb)",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${input:projectDir}/build/${input:exeName}",
+        "args": [],
+        "cwd": "${input:projectDir}",
+        "stopAtEntry": false,
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "miDebuggerPath": "/usr/bin/gdb",
+        "setupCommands": [
+          { "description": "Pretty printing", "text": "-enable-pretty-printing", "ignoreFailures": true }
+        ]
+      }
+    ],
+    "inputs": [
+      {
+        "id": "projectDir",
+        "type": "promptString",
+        "description": "Path to project folder",
+        "default": "${workspaceFolder:Projects}"
+      },
+      {
+        "id": "exeName",
+        "type": "promptString",
+        "description": "Executable name",
+        "default": "main"
+      }
+    ]
+  },
+
+  "extensions": {
+    "recommendations": [
+      "ms-vscode.cpptools",
+      "ms-vscode.cpptools-themes",
+      "ms-vscode.cmake-tools",
+      "ms-vscode-remote.remote-containers"
+    ]
+  }
+}

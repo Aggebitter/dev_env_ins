@@ -12,6 +12,19 @@ an isolated workspace with its own toolchain, build/flash/debug tasks, and knowl
 | Raspberry Pi Pico | arm-none-eabi-gcc, cmake | picotool / USB drag | cortex-debug + OpenOCD |
 | Teensy | PlatformIO | pio upload (HalfKay) | cortex-debug (4.x) |
 
+## Software Environments
+
+Plain software (no hardware) using the same container/workspace pattern:
+
+| Env | Toolchain | Run / Test | Debug |
+|-----|-----------|------------|-------|
+| Python | Python 3.12, uv, ruff, pytest | `uv run`, `uv run pytest` | debugpy |
+| Node | Node 24 LTS, npm, pnpm, TypeScript | `npm start` (native .ts), `node --test` | Node inspector |
+| C/C++ | gcc/g++, clang, CMake + Ninja, ccache, valgrind | `./build/main`, `ctest` | gdb (cppdbg) |
+
+Software containers don't run `--privileged` (no USB needed); they use `--net=host` so dev
+servers are reachable on `localhost`. The C/C++ container adds `SYS_PTRACE` for gdb/valgrind.
+
 ## Prerequisites
 
 - Ubuntu 24.04 (or compatible Debian-based distro)
@@ -35,6 +48,7 @@ bash install.sh
 ```bash
 ./install.sh                          # Full install, all boards
 ./install.sh --boards arduino,pico    # Specific boards only
+./install.sh --boards python,node,cpp # Software environments only
 ./install.sh --skip-containers        # Folders and configs only, no Docker builds
 ./install.sh --skip-vscode            # Skip VS Code install
 ./install.sh --skip-docker            # Skip Docker install
@@ -63,13 +77,19 @@ bash install.sh
 │   │       └── datasheets/arduino/
 │   ├── esp32/
 │   ├── pico/
-│   └── teensy/
+│   ├── teensy/
+│   ├── python/
+│   ├── node/
+│   └── cpp/
 │
 └── dev/                     # Standalone development (same containers, no AI context)
     ├── arduino/
     ├── esp32/
     ├── pico/
-    └── teensy/
+    ├── teensy/
+    ├── python/
+    ├── node/
+    └── cpp/
 ```
 
 Both trees use the same Docker images — the difference is which folder VS Code opens.
@@ -83,6 +103,9 @@ code ~/claude/arduino/arduino.code-workspace
 code ~/claude/esp32/esp32.code-workspace
 code ~/claude/pico/pico.code-workspace
 code ~/claude/teensy/teensy.code-workspace
+code ~/claude/python/python.code-workspace
+code ~/claude/node/node.code-workspace
+code ~/claude/cpp/cpp.code-workspace
 ```
 
 Once the workspace opens, press `Ctrl+Shift+P` and run **Dev Containers: Reopen in Container**.
@@ -109,6 +132,9 @@ for the default build task.
 | ESP32 | ESP-IDF: Build |
 | Pico | Pico: Build |
 | Teensy | PIO: Build |
+| Python | Python: Run |
+| Node | Node: Build (tsc) |
+| C/C++ | C++: Build |
 
 ### USB flashing from inside the container
 
@@ -143,6 +169,9 @@ docker build -t dev-arduino:latest boards/arduino/
 docker build -t dev-esp32:latest   boards/esp32/
 docker build -t dev-pico:latest    boards/pico/
 docker build -t dev-teensy:latest  boards/teensy/
+docker build -t dev-python:latest  boards/python/
+docker build -t dev-node:latest    boards/node/
+docker build -t dev-cpp:latest     boards/cpp/
 ```
 
 ## udev Rules
@@ -163,6 +192,9 @@ new-project arduino blink
 new-project esp32 wifi-sensor dev
 new-project pico hello-world
 new-project teensy midi-controller
+new-project python log-parser     # pyproject.toml + main.py + tests/
+new-project node web-api          # package.json + tsconfig + src/*.ts
+new-project cpp ring-buffer       # CMakeLists.txt + src/main.cpp
 ```
 
 This creates the project folder under `~/<tree>/<board>/projects/<name>/`, adds a
@@ -205,7 +237,10 @@ dev_env_ins/
 │   ├── arduino/            # Dockerfile, devcontainer.json, arduino.code-workspace
 │   ├── esp32/
 │   ├── pico/
-│   └── teensy/
+│   ├── teensy/
+│   ├── python/             # software environments
+│   ├── node/
+│   └── cpp/
 ├── scripts/
 │   ├── new-project.sh      # Create a new project with git init
 │   └── gitignores/         # Board-specific .gitignore templates

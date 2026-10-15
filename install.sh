@@ -14,7 +14,7 @@ log_error()   { echo -e "${RED}[ERROR]${RESET} $*" >&2; exit 1; }
 log_section() { echo -e "\n${BOLD}═══ $* ═══${RESET}"; }
 
 # ── Boards ────────────────────────────────────────────────────────────────────
-BOARDS=(arduino esp32 pico teensy)
+BOARDS=(arduino esp32 pico teensy python node cpp)
 TREES=(claude dev)
 
 # ── Parse args ────────────────────────────────────────────────────────────────
@@ -43,13 +43,14 @@ Options:
   --skip-scripts       Skip new-project symlink installation
   --skip-shortcuts     Skip desktop shortcuts and dash pins
   --boards BOARDS      Comma-separated list of boards to set up (default: all)
-                       Available: arduino,esp32,pico,teensy
+                       Available: arduino,esp32,pico,teensy,python,node,cpp
   -y, --yes            Skip confirmation prompts
   -h, --help           Show this help
 
 Examples:
   $0                                    # Full install
   $0 --boards arduino,pico              # Only Arduino and Pico
+  $0 --boards python,node,cpp           # Only the software environments
   $0 --skip-containers --skip-udev      # Folders and configs only
 EOF
 }

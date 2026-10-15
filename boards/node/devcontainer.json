@@ -1,0 +1,31 @@
+{
+  "name": "Node / TypeScript Dev",
+  "image": "dev-node:latest",
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+
+  // Host networking so dev servers (Vite, Express...) are reachable on localhost
+  "runArgs": ["--net=host"],
+
+  "mounts": [
+    // Persist npm/pnpm caches between rebuilds
+    "source=node-npm-cache,target=/root/.npm,type=volume",
+    "source=node-pnpm-store,target=/root/.local/share/pnpm,type=volume"
+  ],
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+      }
+    }
+  },
+
+  "postCreateCommand": "node --version && npm --version && tsc --version && echo 'Node ready. Create project: new-project node <name>'"
+}
